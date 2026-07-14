@@ -5,19 +5,19 @@ import { getFirestore, doc, getDocFromServer } from "https://www.gstatic.com/fir
 import { getStorage } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
 const firebaseConfig = {
-  projectId: "sylvan-basis-h7krv",
-  appId: "1:467631494457:web:66e7fcef040e17b3f684e8",
-  apiKey: "AIzaSyC2F7K_gDeaneG9EP0WIqtCYMgWyHnw73s",
-  authDomain: "sylvan-basis-h7krv.firebaseapp.com",
-  firestoreDatabaseId: "ai-studio-7494cfa1-b51a-4bec-bed9-ed239820b222",
-  storageBucket: "sylvan-basis-h7krv.firebasestorage.app",
-  messagingSenderId: "467631494457"
+  apiKey: "AIzaSyCJmB4gK_tb6UGDFaKmH_isVYhfzWhmyB0",
+  authDomain: "ipl-game-b6c6a.firebaseapp.com",
+  projectId: "ipl-game-b6c6a",
+  storageBucket: "ipl-game-b6c6a.firebasestorage.app",
+  messagingSenderId: "568874657087",
+  appId: "1:568874657087:web:e84a6fc2a7750726441f8a",
+  measurementId: "G-LWTSG1Z7NE"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+export const db = getFirestore(app);
 export const storage = getStorage(app);
 
 // Error Handling utility matching FirestoreErrorInfo guidelines
