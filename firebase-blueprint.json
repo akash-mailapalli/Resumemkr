@@ -1,0 +1,96 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Information about registered users.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "joinedDate": { "type": "string" },
+        "resumeCount": { "type": "integer" }
+      },
+      "required": ["userId", "displayName", "email"]
+    },
+    "Resume": {
+      "title": "Resume Data",
+      "description": "Full details of a resume, including personal info, education, experience, and custom styling.",
+      "type": "object",
+      "properties": {
+        "resumeId": { "type": "string" },
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "templateId": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "isFavorite": { "type": "boolean" },
+        "tags": { "type": "array" },
+        "notes": { "type": "string" },
+        "personalInfo": { "type": "object" },
+        "summary": { "type": "string" },
+        "education": { "type": "array" },
+        "experience": { "type": "array" },
+        "projects": { "type": "array" },
+        "skills": { "type": "object" },
+        "certifications": { "type": "array" },
+        "languages": { "type": "array" },
+        "achievements": { "type": "array" },
+        "customSections": { "type": "array" },
+        "themeSettings": { "type": "object" }
+      },
+      "required": ["resumeId", "userId", "name", "templateId", "createdAt", "updatedAt"]
+    },
+    "CustomTemplate": {
+      "title": "Custom Template",
+      "description": "User created resume template configurations.",
+      "type": "object",
+      "properties": {
+        "templateId": { "type": "string" },
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "headerLayout": { "type": "string" },
+        "sectionsOrder": { "type": "array" },
+        "fontFamily": { "type": "string" },
+        "colors": { "type": "object" },
+        "borders": { "type": "string" },
+        "iconsStyle": { "type": "string" },
+        "isPublished": { "type": "boolean" }
+      },
+      "required": ["templateId", "userId", "name"]
+    },
+    "Settings": {
+      "title": "User Settings",
+      "description": "General application settings for a user.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "theme": { "type": "string" },
+        "language": { "type": "string" },
+        "autoSaveEnabled": { "type": "boolean" },
+        "defaultTemplateId": { "type": "string" },
+        "pageSize": { "type": "string" }
+      },
+      "required": ["userId"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "Single user profile access."
+    },
+    "resumes/{resumeId}": {
+      "schema": "Resume",
+      "description": "Single resume access and list queries."
+    },
+    "templates/{templateId}": {
+      "schema": "CustomTemplate",
+      "description": "User custom templates."
+    },
+    "settings/{userId}": {
+      "schema": "Settings",
+      "description": "User specific app settings."
+    }
+  }
+}

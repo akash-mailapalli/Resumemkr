@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile - ResumeMkr</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-900 selection:bg-indigo-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="dashboard.html" class="flex items-center gap-2">
+        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">R</div>
+        <span class="text-xl font-display font-bold tracking-tight text-slate-900">ResumeMkr</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-6">
+        <a href="dashboard.html" class="text-sm font-medium text-slate-600 hover:text-indigo-600">My Resumes</a>
+        <a href="templates.html" class="text-sm font-medium text-slate-600 hover:text-indigo-600">Templates Gallery</a>
+        <a href="profile.html" class="text-sm font-semibold text-indigo-600">Profile</a>
+        <a href="settings.html" class="text-sm font-medium text-slate-600 hover:text-indigo-600">Settings</a>
+      </nav>
+      <div class="flex items-center gap-4">
+        <button id="logout-btn" class="text-slate-400 hover:text-rose-600 p-2 rounded-lg hover:bg-rose-50 transition-all cursor-pointer">
+          <i data-lucide="log-out" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Profile Workspace -->
+  <main class="max-w-3xl mx-auto px-6 py-10 space-y-8">
+    <div class="space-y-1">
+      <h1 class="text-3xl font-display font-extrabold text-slate-900">Profile Management</h1>
+      <p class="text-sm text-slate-500">Edit your default professional details to bootstrap all future resume drafts.</p>
+    </div>
+
+    <!-- Alert Box -->
+    <div id="alert" class="hidden p-4 rounded-xl text-xs flex items-start gap-2.5">
+      <div id="alert-icon-container">
+        <i data-lucide="alert-circle" class="w-4.5 h-4.5 shrink-0"></i>
+      </div>
+      <span id="alert-message"></span>
+    </div>
+
+    <div class="bg-white border border-slate-200 rounded-3xl p-8 shadow-xl space-y-8">
+      
+      <!-- Profile Header Avatar Upload -->
+      <div class="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-slate-100">
+        <div class="relative group">
+          <img id="avatar-preview" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&h=120&q=80" class="w-24 h-24 rounded-full border border-slate-200 object-cover shadow-md" alt="Avatar">
+          <!-- Hidden File picker -->
+          <input type="file" id="avatar-file-input" accept="image/*" class="hidden">
+        </div>
+        <div class="space-y-1 text-center sm:text-left">
+          <h3 id="profile-name" class="font-bold text-lg text-slate-800">John Doe</h3>
+          <p id="profile-email" class="text-xs text-slate-400 font-mono">johndoe@example.com</p>
+          <div class="flex gap-2 justify-center sm:justify-start pt-2">
+            <button id="upload-avatar-trigger" class="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer">
+              <i data-lucide="camera" class="w-4 h-4"></i> Upload Photo
+            </button>
+            <button id="delete-avatar-btn" class="px-3 py-2 text-rose-500 hover:bg-rose-50 text-xs font-bold rounded-xl transition-all cursor-pointer">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- General Bio Details form -->
+      <form id="profile-form" class="space-y-6">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="col-span-2 sm:col-span-1">
+            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Display Name</label>
+            <input type="text" id="p-display-name" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition-all">
+          </div>
+          <div class="col-span-2 sm:col-span-1">
+            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Professional Job Title</label>
+            <input type="text" id="p-title" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition-all" placeholder="e.g. Lead Systems Engineer">
+          </div>
+          <div class="col-span-2 sm:col-span-1">
+            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Phone</label>
+            <input type="text" id="p-phone" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition-all">
+          </div>
+          <div class="col-span-2 sm:col-span-1">
+            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Contact Address / Location</label>
+            <input type="text" id="p-address" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition-all">
+          </div>
+          <div class="col-span-2 sm:col-span-1">
+            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">LinkedIn Profile URL</label>
+            <input type="text" id="p-linkedin" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition-all">
+          </div>
+          <div class="col-span-2 sm:col-span-1">
+            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">GitHub Profile URL</label>
+            <input type="text" id="p-github" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition-all">
+          </div>
+          <div class="col-span-2">
+            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Portfolio / Personal Website</label>
+            <input type="text" id="p-website" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition-all">
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm shadow-lg transition-all flex items-center justify-center gap-2">
+          Save Profile Details <i data-lucide="check" class="w-4 h-4"></i>
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initAuthProtection, logoutUser, updateUserInfo } from "./auth.js";
+    import { db } from "./firebase.js";
+    import { doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    let currentUser = null;
+
+    const alertBox = document.getElementById("alert");
+    const alertIconContainer = document.getElementById("alert-icon-container");
+    const alertMessage = document.getElementById("alert-message");
+
+    const avatarPreview = document.getElementById("avatar-preview");
+    const fileInput = document.getElementById("avatar-file-input");
+
+    function showAlert(text, isSuccess = false) {
+      alertMessage.textContent = text;
+      if (isSuccess) {
+        alertBox.className = "p-4 bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs rounded-xl flex items-start gap-2.5";
+        alertIconContainer.innerHTML = `<i data-lucide="check-circle" class="w-4.5 h-4.5 text-emerald-500 shrink-0"></i>`;
+      } else {
+        alertBox.className = "p-4 bg-rose-50 border border-rose-100 text-rose-700 text-xs rounded-xl flex items-start gap-2.5";
+        alertIconContainer.innerHTML = `<i data-lucide="alert-circle" class="w-4.5 h-4.5 text-rose-500 shrink-0"></i>`;
+      }
+      alertBox.classList.remove("hidden");
+      lucide.createIcons();
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      currentUser = await initAuthProtection(true, "login.html");
+      if (!currentUser) return;
+
+      // Fill info
+      document.getElementById("profile-name").textContent = currentUser.displayName || "User";
+      document.getElementById("profile-email").textContent = currentUser.email;
+      document.getElementById("p-display-name").value = currentUser.displayName || "";
+      if (currentUser.photoURL) {
+        avatarPreview.src = currentUser.photoURL;
+      }
+
+      document.getElementById("logout-btn").addEventListener("click", logoutUser);
+
+      // Load optional metadata from user document settings collection
+      try {
+        const docSnap = await getDoc(doc(db, "users", currentUser.uid));
+        if (docSnap.exists()) {
+          const udata = docSnap.data();
+          document.getElementById("p-title").value = udata.title || "";
+          document.getElementById("p-phone").value = udata.phone || "";
+          document.getElementById("p-address").value = udata.address || "";
+          document.getElementById("p-linkedin").value = udata.linkedin || "";
+          document.getElementById("p-github").value = udata.github || "";
+          document.getElementById("p-website").value = udata.website || "";
+        }
+      } catch (err) {
+        console.error("Error fetching extra user data", err);
+      }
+
+      // Upload profile image triggers
+      document.getElementById("upload-avatar-trigger").addEventListener("click", () => fileInput.click());
+      
+      fileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = async (event) => {
+            avatarPreview.src = event.target.result;
+            // Update auth photoUrl directly with the base64 URI (simplifies lack of Firebase Storage bucket settings in dev environment)
+            try {
+              await updateUserInfo(currentUser, { photoURL: event.target.result });
+              showAlert("Profile photo updated successfully!", true);
+            } catch (err) {
+              showAlert("Failed to upload avatar.");
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      document.getElementById("delete-avatar-btn").addEventListener("click", async () => {
+        try {
+          await updateUserInfo(currentUser, { photoURL: "" });
+          avatarPreview.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&h=120&q=80";
+          showAlert("Profile photo removed.", true);
+        } catch (err) {
+          showAlert("Could not remove photo.");
+        }
+      });
+
+      // Submit form
+      document.getElementById("profile-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        alertBox.classList.add("hidden");
+
+        const displayName = document.getElementById("p-display-name").value;
+        const extraPayload = {
+          title: document.getElementById("p-title").value,
+          phone: document.getElementById("p-phone").value,
+          address: document.getElementById("p-address").value,
+          linkedin: document.getElementById("p-linkedin").value,
+          github: document.getElementById("p-github").value,
+          website: document.getElementById("p-website").value
+        };
+
+        try {
+          // Update profile DisplayName
+          await updateUserInfo(currentUser, { displayName });
+          
+          // Save parameters in 'users' doc
+          await setDoc(doc(db, "users", currentUser.uid), {
+            userId: currentUser.uid,
+            displayName,
+            ...extraPayload,
+            updatedAt: new Date().toISOString()
+          }, { merge: true });
+
+          document.getElementById("profile-name").textContent = displayName;
+          showAlert("Profile details updated successfully!", true);
+        } catch (err) {
+          showAlert(err.message || "Failed to update profile settings.");
+        }
+      });
+
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
