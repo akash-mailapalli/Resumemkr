@@ -1,6 +1,0 @@
-{
-  "name": "ResumeMkr",
-  "description": "Create Beautiful ATS Friendly Resumes Free Forever",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
