@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume Builder - ResumeMkr</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Lato:wght@300;400;500;600;700&family=Open+Sans:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=Georgia&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet" crossorigin="anonymous">
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./builder.css">
+  <link rel="stylesheet" href="./template.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Export engines loaded via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+</head>
+<body class="bg-slate-100 font-sans text-slate-900 selection:bg-indigo-500 selection:text-white transition-colors duration-200" id="builder-body-root">
+
+  <!-- Builder Header bar -->
+  <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 sticky top-0 z-40 transition-colors duration-200" id="builder-header">
+    <div class="flex items-center gap-4">
+      <a href="dashboard.html" class="p-2 hover:bg-slate-50 text-slate-400 hover:text-slate-600 rounded-xl transition-all" title="Back to Dashboard">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      </a>
+      <div class="flex flex-col">
+        <h1 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+          <span id="resume-title">Loading Resume...</span>
+          <button id="rename-title-btn" class="p-1 hover:bg-slate-50 rounded text-slate-400 hover:text-indigo-600"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+        </h1>
+        <div class="flex items-center gap-2 text-xs">
+          <span id="sync-status" class="flex items-center gap-1.5 text-slate-400 font-medium">
+            <span class="w-2 h-2 rounded-full bg-slate-300"></span> Initializing...
+          </span>
+        </div>
+      </div>
+      <!-- Undo / Redo Buttons -->
+      <div class="flex items-center gap-1 border-l border-slate-200 pl-4 h-8">
+        <button id="undo-btn" class="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-indigo-600 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-400 transition-all cursor-pointer flex items-center justify-center" title="Undo (Ctrl+Z)" disabled>
+          <i data-lucide="undo" class="w-4 h-4"></i>
+        </button>
+        <button id="redo-btn" class="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-indigo-600 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-400 transition-all cursor-pointer flex items-center justify-center" title="Redo (Ctrl+Y)" disabled>
+          <i data-lucide="redo" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Header Tools -->
+    <div class="flex items-center gap-4">
+      <!-- Dark/Light theme builder workspace -->
+      <button id="builder-theme-toggle" class="p-2.5 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-amber-500 transition-all cursor-pointer" title="Toggle Workspace Dark Mode">
+        <i data-lucide="sun" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Zoom Slider Controller -->
+      <div class="hidden lg:flex items-center gap-3 border border-slate-200 rounded-xl px-4 py-1.5 bg-slate-50">
+        <i data-lucide="zoom-out" class="w-4 h-4 text-slate-400 cursor-pointer" id="zoom-out-btn"></i>
+        <input type="range" id="zoom-slider" min="50" max="150" value="100" class="w-20 accent-indigo-600 cursor-pointer">
+        <i data-lucide="zoom-in" class="w-4 h-4 text-slate-400 cursor-pointer" id="zoom-in-btn"></i>
+        <span id="zoom-label" class="text-xs font-semibold text-slate-500 w-10 text-right">100%</span>
+      </div>
+
+      <!-- Export Actions Dropdown -->
+      <div class="relative">
+        <button id="export-dropdown-btn" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition-all shadow-md shadow-indigo-100 flex items-center gap-2">
+          Export Resume <i data-lucide="chevron-down" class="w-4 h-4"></i>
+        </button>
+        <div id="export-menu" class="hidden absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 overflow-hidden py-1">
+          <button id="export-pdf-btn" class="w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 hover:text-indigo-600 flex items-center gap-2">
+            <i data-lucide="file-text" class="w-4 h-4 text-rose-500"></i> Download PDF
+          </button>
+          <button id="export-word-btn" class="w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 hover:text-indigo-600 flex items-center gap-2">
+            <i data-lucide="file" class="w-4 h-4 text-blue-500"></i> Download Word (.docx)
+          </button>
+          <button id="export-json-btn" class="w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 hover:text-indigo-600 flex items-center gap-2">
+            <i data-lucide="database" class="w-4 h-4 text-indigo-500"></i> Export Backup (JSON)
+          </button>
+          <hr class="border-slate-100">
+          <button id="print-btn" class="w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 hover:text-indigo-600 flex items-center gap-2">
+            <i data-lucide="printer" class="w-4 h-4 text-emerald-500"></i> Print Resume (Ctrl+P)
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Split Pane -->
+  <div class="builder-split-container">
+    
+    <!-- LEFT PANEL: Dynamic Form Editor -->
+    <div class="builder-form-pane space-y-8" id="form-scroll-pane">
+      
+      <!-- Resume Score Widget -->
+      <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-5 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold text-indigo-900 uppercase tracking-wider">Resume Strengths & Score</h3>
+          <span id="resume-strength-badge" class="px-2.5 py-0.5 bg-indigo-100 text-indigo-700 font-bold text-[10px] rounded-full uppercase tracking-wider">Draft</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <!-- Circular Progress Meter -->
+          <div class="relative w-14 h-14 flex items-center justify-center bg-white rounded-full shadow-inner border border-indigo-100 shrink-0">
+            <span id="resume-score-pct" class="text-base font-extrabold text-indigo-600">0%</span>
+          </div>
+          <div class="space-y-1">
+            <div class="text-xs font-semibold text-slate-600">Completeness: <span id="score-complete" class="font-bold">0%</span> | ATS: <span id="score-ats" class="font-bold text-emerald-600">Good</span></div>
+            <p id="score-tip" class="text-[11px] text-slate-500">Provide personal info and summaries to increase readability.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Section Anchor Links for speed -->
+      <div class="flex items-center gap-2 flex-wrap pb-2 border-b border-slate-100">
+        <a href="#section-personal" class="px-3 py-1.5 bg-slate-50 hover:bg-indigo-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:text-indigo-600 transition-all">Personal Info</a>
+        <a href="#section-summary" class="px-3 py-1.5 bg-slate-50 hover:bg-indigo-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:text-indigo-600 transition-all">Summary</a>
+        <a href="#section-experience" class="px-3 py-1.5 bg-slate-50 hover:bg-indigo-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:text-indigo-600 transition-all">Work Experience</a>
+        <a href="#section-education" class="px-3 py-1.5 bg-slate-50 hover:bg-indigo-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:text-indigo-600 transition-all">Education</a>
+        <a href="#section-projects" class="px-3 py-1.5 bg-slate-50 hover:bg-indigo-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:text-indigo-600 transition-all">Projects</a>
+        <a href="#section-skills" class="px-3 py-1.5 bg-slate-50 hover:bg-indigo-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:text-indigo-600 transition-all">Skills</a>
+        <a href="#section-certifications" class="px-3 py-1.5 bg-slate-50 hover:bg-indigo-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:text-indigo-600 transition-all">Certifications</a>
+        <a href="#section-achievements" class="px-3 py-1.5 bg-slate-50 hover:bg-indigo-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:text-indigo-600 transition-all">Awards</a>
+        <a href="#section-theme" class="px-3 py-1.5 bg-slate-50 hover:bg-indigo-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:text-indigo-600 transition-all">Theme Design</a>
+      </div>
+
+      <!-- Form container -->
+      <form id="resume-builder-form" class="space-y-6" onsubmit="event.preventDefault();">
+        
+        <!-- SECTION 1: Personal Info -->
+        <div class="builder-section-box space-y-4" id="section-personal">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2"><i data-lucide="user" class="w-4 h-4 text-indigo-500"></i> Personal Information</h3>
+            <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Section 1</span>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-2 sm:col-span-1">
+              <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider flex items-center"><i data-lucide="user" class="w-3.5 h-3.5 text-indigo-500 mr-1.5"></i> Full Name</label>
+              <input type="text" id="p-fullname" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm" placeholder="Alex Rivera">
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider flex items-center"><i data-lucide="briefcase" class="w-3.5 h-3.5 text-indigo-500 mr-1.5"></i> Professional Title</label>
+              <input type="text" id="p-title" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm" placeholder="Senior Systems Architect">
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider flex items-center"><i data-lucide="mail" class="w-3.5 h-3.5 text-indigo-500 mr-1.5"></i> Email</label>
+              <input type="email" id="p-email" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm" placeholder="alex.rivera@example.com">
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider flex items-center"><i data-lucide="phone" class="w-3.5 h-3.5 text-indigo-500 mr-1.5"></i> Phone</label>
+              <input type="text" id="p-phone" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm" placeholder="+1 (555) 019-2834">
+            </div>
+            <div class="col-span-2">
+              <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider flex items-center"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-indigo-500 mr-1.5"></i> Address / Location</label>
+              <input type="text" id="p-address" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm" placeholder="San Francisco, CA">
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider flex items-center"><i data-lucide="linkedin" class="w-3.5 h-3.5 text-indigo-500 mr-1.5"></i> LinkedIn</label>
+              <input type="text" id="p-linkedin" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm" placeholder="linkedin.com/in/alexrivera">
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider flex items-center"><i data-lucide="github" class="w-3.5 h-3.5 text-indigo-500 mr-1.5"></i> GitHub</label>
+              <input type="text" id="p-github" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm" placeholder="github.com/alexrivera">
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider flex items-center"><i data-lucide="globe" class="w-3.5 h-3.5 text-indigo-500 mr-1.5"></i> Portfolio Site</label>
+              <input type="text" id="p-portfolio" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm" placeholder="alexrivera.dev">
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider flex items-center"><i data-lucide="image" class="w-3.5 h-3.5 text-indigo-500 mr-1.5"></i> Profile Photo URL</label>
+              <input type="text" id="p-photourl" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm" placeholder="Optional URL of photo">
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2: Summary -->
+        <div class="builder-section-box space-y-4" id="section-summary">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4 text-indigo-500"></i> Professional Summary</h3>
+            <span id="summary-char-count" class="char-counter">0 chars</span>
+          </div>
+          <textarea id="p-summary" rows="4" class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm leading-relaxed" placeholder="Write a short summary about your skills, accomplishments, and target roles..."></textarea>
+        </div>
+
+        <!-- SECTION 3: Work Experience (Accordion lists) -->
+        <div class="builder-section-box space-y-4" id="section-experience">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2"><i data-lucide="briefcase" class="w-4 h-4 text-indigo-500"></i> Work Experience</h3>
+            <button type="button" id="add-experience-btn" class="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold text-xs rounded-lg transition-all flex items-center gap-1.5 cursor-pointer">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Position
+            </button>
+          </div>
+          <div id="experience-list-container" class="space-y-4">
+            <!-- Experience entries injected dynamically -->
+          </div>
+        </div>
+
+        <!-- SECTION 4: Education -->
+        <div class="builder-section-box space-y-4" id="section-education">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2"><i data-lucide="graduation-cap" class="w-4 h-4 text-indigo-500"></i> Education</h3>
+            <button type="button" id="add-education-btn" class="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold text-xs rounded-lg transition-all flex items-center gap-1.5 cursor-pointer">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Education
+            </button>
+          </div>
+          <div id="education-list-container" class="space-y-4">
+            <!-- Education entries injected dynamically -->
+          </div>
+        </div>
+
+        <!-- SECTION 5: Projects -->
+        <div class="builder-section-box space-y-4" id="section-projects">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2"><i data-lucide="folder-git2" class="w-4 h-4 text-indigo-500"></i> Projects</h3>
+            <button type="button" id="add-projects-btn" class="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold text-xs rounded-lg transition-all flex items-center gap-1.5 cursor-pointer">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Project
+            </button>
+          </div>
+          <div id="projects-list-container" class="space-y-4">
+            <!-- Projects injected dynamically -->
+          </div>
+        </div>
+
+        <!-- SECTION 6: Skills & Languages (Dynamic Category Subheadings) -->
+        <div class="builder-section-box space-y-4" id="section-skills">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4 text-indigo-500"></i> Skills & Languages</h3>
+            <button type="button" id="add-skill-section-btn" class="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold text-xs rounded-lg transition-all flex items-center gap-1.5 cursor-pointer">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Skill Section
+            </button>
+          </div>
+          
+          <div id="skills-sections-container" class="space-y-4">
+            <!-- Dynamic skills categories injected here -->
+          </div>
+        </div>
+
+        <!-- SECTION 6.1: Certifications -->
+        <div class="builder-section-box space-y-4" id="section-certifications">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2"><i data-lucide="award" class="w-4 h-4 text-indigo-500"></i> Certifications</h3>
+            <button type="button" id="add-cert-btn" class="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold text-xs rounded-lg transition-all flex items-center gap-1.5 cursor-pointer">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Certification
+            </button>
+          </div>
+          <div id="certifications-list-container" class="space-y-2">
+            <!-- Certifications dynamic inputs -->
+          </div>
+        </div>
+
+        <!-- SECTION 6.2: Awards & Achievements -->
+        <div class="builder-section-box space-y-4" id="section-achievements">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2"><i data-lucide="trophy" class="w-4 h-4 text-indigo-500"></i> Awards & Achievements</h3>
+            <button type="button" id="add-achievement-btn" class="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold text-xs rounded-lg transition-all flex items-center gap-1.5 cursor-pointer">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Award
+            </button>
+          </div>
+          <div id="achievements-list-container" class="space-y-2">
+            <!-- Achievements dynamic inputs -->
+          </div>
+        </div>
+
+        <!-- SECTION 7: Custom Sections and Reordering -->
+        <div class="builder-section-box space-y-4" id="section-custom">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2"><i data-lucide="cog" class="w-4 h-4 text-indigo-500"></i> Custom Sections</h3>
+            <button type="button" id="add-custom-section-btn" class="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold text-xs rounded-lg transition-all flex items-center gap-1.5 cursor-pointer">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> New Custom
+            </button>
+          </div>
+          <div id="custom-sections-container" class="space-y-4">
+            <!-- Custom Sections list -->
+          </div>
+        </div>
+
+        <!-- SECTION 7.5: Rearrange Sections -->
+        <div class="builder-section-box space-y-4" id="section-reorder">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4 text-indigo-500"></i> Rearrange Sections</h3>
+            <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Order Sections</span>
+          </div>
+          <p class="text-[11px] text-slate-400 leading-relaxed">Use the up and down arrows to rearrange the vertical order of sections on your resume.</p>
+          <div id="reorder-sections-container" class="space-y-2">
+            <!-- Dynamically populated section list with Up/Down buttons -->
+          </div>
+        </div>
+
+        <!-- SECTION 8: Theme Customization -->
+        <div class="builder-section-box space-y-4" id="section-theme">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2"><i data-lucide="palette" class="w-4 h-4 text-indigo-500"></i> Theme Customization</h3>
+            <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Design Options</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Font Family</label>
+              <select id="theme-font" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm cursor-pointer">
+                <option value="Inter">Inter (Sans)</option>
+                <option value="Poppins">Poppins (Tech)</option>
+                <option value="Lato">Lato (Modern)</option>
+                <option value="Open-Sans">Open Sans</option>
+                <option value="Roboto">Roboto</option>
+                <option value="Georgia">Georgia (Serif)</option>
+                <option value="Times">Times New Roman</option>
+                <option value="Calibri">Calibri</option>
+                <option value="Arial">Arial</option>
+                <option value="Courier">Courier (Mono)</option>
+                <option value="JetBrains">JetBrains Mono</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Page Size</label>
+              <select id="theme-pagesize" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm cursor-pointer">
+                <option value="A4">A4 (Standard)</option>
+                <option value="Letter">Letter</option>
+                <option value="Legal">Legal</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Header Alignment</label>
+              <select id="theme-header-align" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm cursor-pointer">
+                <option value="left">Left Corner</option>
+                <option value="center">Center</option>
+                <option value="right">Right Corner</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Primary Theme Color</label>
+              <div class="flex items-center gap-2">
+                <input type="color" id="theme-primary" class="w-10 h-10 border border-slate-200 rounded-xl cursor-pointer bg-transparent">
+                <input type="text" id="theme-primary-text" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-mono uppercase" placeholder="#0f172a">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Secondary Theme Color</label>
+              <div class="flex items-center gap-2">
+                <input type="color" id="theme-secondary" class="w-10 h-10 border border-slate-200 rounded-xl cursor-pointer bg-transparent">
+                <input type="text" id="theme-secondary-text" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-mono uppercase" placeholder="#475569">
+              </div>
+            </div>
+
+            <!-- Sliders -->
+            <div class="col-span-2 space-y-4 pt-2">
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Font Size</label>
+                  <span id="val-font-size" class="text-xs font-bold text-indigo-600">14px</span>
+                </div>
+                <input type="range" id="theme-fontsize" min="10" max="20" value="14" class="w-full accent-indigo-600 cursor-pointer">
+              </div>
+
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Line Height</label>
+                  <span id="val-line-height" class="text-xs font-bold text-indigo-600">1.5</span>
+                </div>
+                <input type="range" id="theme-lineheight" min="1.0" max="2.0" step="0.1" value="1.5" class="w-full accent-indigo-600 cursor-pointer">
+              </div>
+
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Margins</label>
+                  <span id="val-margins" class="text-xs font-bold text-indigo-600">20px</span>
+                </div>
+                <input type="range" id="theme-margins" min="0" max="40" value="20" class="w-full accent-indigo-600 cursor-pointer">
+              </div>
+
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Section Gap</label>
+                  <span id="val-sectiongap" class="text-xs font-bold text-indigo-600">16px</span>
+                </div>
+                <input type="range" id="theme-sectiongap" min="0" max="32" value="16" class="w-full accent-indigo-600 cursor-pointer">
+              </div>
+
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Header Gap</label>
+                  <span id="val-headergap" class="text-xs font-bold text-indigo-600">8px</span>
+                </div>
+                <input type="range" id="theme-headergap" min="0" max="24" value="8" class="w-full accent-indigo-600 cursor-pointer">
+              </div>
+
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Header Name Size</label>
+                  <span id="val-headersize" class="text-xs font-bold text-indigo-600">24px</span>
+                </div>
+                <input type="range" id="theme-headersize" min="16" max="36" value="24" class="w-full accent-indigo-600 cursor-pointer">
+              </div>
+
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Top Margin</label>
+                  <span id="val-topmargin" class="text-xs font-bold text-indigo-600">20px</span>
+                </div>
+                <input type="range" id="theme-topmargin" min="0" max="60" value="20" class="w-full accent-indigo-600 cursor-pointer">
+              </div>
+            </div>
+
+            <!-- Toggles -->
+            <div class="col-span-2 grid grid-cols-3 gap-3 pt-2">
+              <label class="flex flex-col gap-1 items-center justify-center p-3 border border-slate-200 rounded-xl cursor-pointer select-none">
+                <input type="checkbox" id="theme-showphoto" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500">
+                <span class="text-[10px] font-bold text-slate-500 uppercase mt-1">Show Photo</span>
+              </label>
+              <label class="flex flex-col gap-1 items-center justify-center p-3 border border-slate-200 rounded-xl cursor-pointer select-none">
+                <input type="checkbox" id="theme-showicons" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500">
+                <span class="text-[10px] font-bold text-slate-500 uppercase mt-1">Show Icons</span>
+              </label>
+              <label class="flex flex-col gap-1 items-center justify-center p-3 border border-slate-200 rounded-xl cursor-pointer select-none">
+                <input type="checkbox" id="theme-showlines" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500">
+                <span class="text-[10px] font-bold text-slate-500 uppercase mt-1">Show Dividers</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- RIGHT PANEL: Live PDF Preview Pane -->
+    <div class="builder-preview-pane relative" id="preview-panel-pane">
+      
+      <!-- Sticky Float Toolbar -->
+      <div class="mb-4 bg-slate-800/90 text-white rounded-full px-4 py-2 border border-slate-700/80 shadow-lg flex items-center gap-6 text-xs font-semibold backdrop-blur-sm">
+        <span class="flex items-center gap-1.5 text-slate-300">
+          <i data-lucide="layout-template" class="w-4 h-4"></i> Active Style:
+        </span>
+        <select id="active-template-selector" class="bg-transparent border-none text-indigo-300 font-bold focus:outline-none cursor-pointer">
+          <!-- Populated in JS with 30 templates -->
+        </select>
+        <span class="h-4 w-[1px] bg-slate-700"></span>
+        <button id="fit-zoom-btn" class="hover:text-indigo-300 transition-colors flex items-center gap-1">
+          <i data-lucide="maximize" class="w-4 h-4"></i> Fit Screen
+        </button>
+      </div>
+
+      <!-- Preview container -->
+      <div class="preview-zoom-container shadow-2xl" id="zoom-container">
+        <div id="resume-a4-preview" class="resume-preview-container p-[20px] font-Inter text-[14px] leading-[1.5]" style="--primary-color: #0f172a; --secondary-color: #475569;">
+          <!-- Live Preview structure dynamically compiled here -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Rename Title Modal -->
+  <div id="rename-title-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm px-4">
+    <div class="bg-white rounded-2xl border border-slate-100 max-w-md w-full p-6 shadow-2xl space-y-6">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-slate-800">Rename Resume</h3>
+        <button class="title-modal-close p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="rename-title-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">New Title</label>
+          <input type="text" id="modal-resume-name" required class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition-all">
+        </div>
+        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition-all">
+          Save Changes
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="./builder.js"></script>
+</body>
+</html>

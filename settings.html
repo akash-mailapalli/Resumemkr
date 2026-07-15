@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - ResumeMkr</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-900 selection:bg-indigo-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="dashboard.html" class="flex items-center gap-2">
+        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">R</div>
+        <span class="text-xl font-display font-bold tracking-tight text-slate-900">ResumeMkr</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-6">
+        <a href="dashboard.html" class="text-sm font-medium text-slate-600 hover:text-indigo-600">My Resumes</a>
+        <a href="templates.html" class="text-sm font-medium text-slate-600 hover:text-indigo-600">Templates Gallery</a>
+        <a href="profile.html" class="text-sm font-medium text-slate-600 hover:text-indigo-600">Profile</a>
+        <a href="settings.html" class="text-sm font-semibold text-indigo-600">Settings</a>
+      </nav>
+      <div class="flex items-center gap-4">
+        <button id="logout-btn" class="text-slate-400 hover:text-rose-600 p-2 rounded-lg hover:bg-rose-50 transition-all cursor-pointer">
+          <i data-lucide="log-out" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Settings Workspace -->
+  <main class="max-w-3xl mx-auto px-6 py-10 space-y-8">
+    <div class="space-y-1">
+      <h1 class="text-3xl font-display font-extrabold text-slate-900">Account Settings</h1>
+      <p class="text-sm text-slate-500">Configure security parameters, backup your data, or manage your account.</p>
+    </div>
+
+    <!-- Alert Message Banner -->
+    <div id="alert" class="hidden p-4 rounded-xl text-xs flex items-start gap-2.5">
+      <div id="alert-icon-container">
+        <i data-lucide="alert-circle" class="w-4.5 h-4.5 shrink-0"></i>
+      </div>
+      <span id="alert-message"></span>
+    </div>
+
+    <!-- Block 1: Security Change Password -->
+    <div class="bg-white border border-slate-200 rounded-3xl p-8 shadow-xl space-y-6">
+      <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2"><i data-lucide="lock" class="text-indigo-600"></i> Change Password</h3>
+      <form id="password-change-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Current Password</label>
+          <input type="password" id="current-password" required minlength="6" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition-all">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">New Password</label>
+          <input type="password" id="new-password" required minlength="6" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition-all">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Confirm New Password</label>
+          <input type="password" id="confirm-password" required minlength="6" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition-all">
+        </div>
+        <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs transition-all shadow-md shadow-indigo-100 flex items-center gap-1.5">
+          Update Password <i data-lucide="shield" class="w-4 h-4"></i>
+        </button>
+      </form>
+    </div>
+
+    <!-- Block 2: Backups and Restores -->
+    <div class="bg-white border border-slate-200 rounded-3xl p-8 shadow-xl space-y-6">
+      <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2"><i data-lucide="database" class="text-indigo-600"></i> Backup & Restore Data</h3>
+      <div class="grid sm:grid-cols-2 gap-6">
+        <div class="p-5 border border-slate-100 rounded-2xl bg-slate-50/50 space-y-3">
+          <h4 class="font-bold text-slate-700 text-sm">Download Backup</h4>
+          <p class="text-xs text-slate-500 leading-normal">Download a single unified JSON backup file containing all of your resumes and custom layouts.</p>
+          <button id="download-all-backup-btn" class="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="download" class="w-4 h-4"></i> Export All Data
+          </button>
+        </div>
+
+        <div class="p-5 border border-slate-100 rounded-2xl bg-slate-50/50 space-y-3">
+          <h4 class="font-bold text-slate-700 text-sm">Restore from Backup</h4>
+          <p class="text-xs text-slate-500 leading-normal">Select a previously exported unified backup JSON file to import your resumes back into this account.</p>
+          <input type="file" id="restore-file-input" accept=".json" class="hidden">
+          <button id="restore-backup-trigger" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="upload" class="w-4 h-4"></i> Select Backup File
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Block 3: Danger Zone -->
+    <div class="bg-white border border-rose-200 rounded-3xl p-8 shadow-xl space-y-6">
+      <h3 class="font-bold text-rose-800 text-lg flex items-center gap-2"><i data-lucide="alert-triangle" class="text-rose-600 animate-pulse"></i> Danger Zone</h3>
+      <div class="p-5 bg-rose-50/50 border border-rose-100 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="space-y-1 max-w-md">
+          <h4 class="font-bold text-rose-950 text-sm">Permanently Delete Account</h4>
+          <p class="text-xs text-rose-700/80 leading-normal">Deleting your account removes all authorization metrics, all resumes, all designs, and completely purges your history. This is completely irreversible.</p>
+        </div>
+        <button id="delete-account-btn" class="px-5 py-3 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs transition-all shadow-md shrink-0 cursor-pointer">
+          Delete My Account
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Delete Account Confirmation Modal -->
+  <div id="delete-account-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm px-4">
+    <div class="bg-white rounded-2xl border border-rose-200 max-w-md w-full p-6 shadow-2xl space-y-5">
+      <div class="flex items-center gap-3 text-rose-600">
+        <div class="p-2 bg-rose-50 rounded-xl">
+          <i data-lucide="alert-triangle" class="w-6 h-6 animate-pulse"></i>
+        </div>
+        <h3 class="text-lg font-bold font-display">Delete Account Permanently?</h3>
+      </div>
+      <p class="text-sm text-slate-600">This action is CRITICAL and completely irreversible. All your resumes, data, and configurations will be permanently purged.</p>
+      
+      <div class="space-y-2">
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Type <span class="text-rose-600 font-extrabold">YES</span> to execute purge</label>
+        <input type="text" id="delete-account-confirm-input" placeholder="YES" class="w-full px-4 py-3 border border-rose-200 rounded-xl text-sm focus:outline-none focus:border-rose-500 transition-all uppercase">
+      </div>
+      
+      <div class="flex items-center gap-3 pt-2">
+        <button type="button" id="delete-account-cancel-btn" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition-all cursor-pointer">
+          Cancel
+        </button>
+        <button type="button" id="delete-account-confirm-btn" class="flex-1 py-3 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl text-sm transition-all cursor-pointer">
+          Purge Account
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initAuthProtection, logoutUser, updateUserPassword, reauthenticateAndChangePassword, deleteUserAccount } from "./auth.js";
+    import { db } from "./firebase.js";
+    import { collection, query, where, getDocs, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    let currentUser = null;
+
+    const alertBox = document.getElementById("alert");
+    const alertIconContainer = document.getElementById("alert-icon-container");
+    const alertMessage = document.getElementById("alert-message");
+
+    function showAlert(text, isSuccess = false) {
+      alertMessage.textContent = text;
+      if (isSuccess) {
+        alertBox.className = "p-4 bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs rounded-xl flex items-start gap-2.5";
+        alertIconContainer.innerHTML = `<i data-lucide="check-circle" class="w-4.5 h-4.5 text-emerald-500 shrink-0"></i>`;
+      } else {
+        alertBox.className = "p-4 bg-rose-50 border border-rose-100 text-rose-700 text-xs rounded-xl flex items-start gap-2.5";
+        alertIconContainer.innerHTML = `<i data-lucide="alert-circle" class="w-4.5 h-4.5 text-rose-500 shrink-0"></i>`;
+      }
+      alertBox.classList.remove("hidden");
+      lucide.createIcons();
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      currentUser = await initAuthProtection(true, "login.html");
+      if (!currentUser) return;
+
+      document.getElementById("logout-btn").addEventListener("click", logoutUser);
+
+      // Check if user is signed in via Google
+      const isGoogleUser = currentUser.providerData && currentUser.providerData.some(p => p.providerId === "google.com");
+      if (isGoogleUser) {
+        // Display a helpful information panel instead of the password input fields
+        const form = document.getElementById("password-change-form");
+        form.innerHTML = `
+          <div class="p-4 bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs rounded-xl flex items-start gap-2.5">
+            <i data-lucide="info" class="w-4.5 h-4.5 text-indigo-500 shrink-0"></i>
+            <div>
+              <p class="font-bold mb-1 text-slate-800">Signed in via Google Authentication</p>
+              <p class="text-slate-600 font-medium">Your account credentials and security are managed securely by Google. You do not need to set or maintain a local password here.</p>
+            </div>
+          </div>
+        `;
+        lucide.createIcons();
+      } else {
+        // Handle password changes for standard email/password users
+        document.getElementById("password-change-form").addEventListener("submit", async (e) => {
+          e.preventDefault();
+          alertBox.classList.add("hidden");
+
+          const currPass = document.getElementById("current-password").value;
+          const newPass = document.getElementById("new-password").value;
+          const confPass = document.getElementById("confirm-password").value;
+
+          if (newPass !== confPass) {
+            showAlert("Confirm password matching failed. Both values must be identical.");
+            return;
+          }
+
+          try {
+            await reauthenticateAndChangePassword(currPass, newPass);
+            showAlert("Security credentials updated! Your new password is now active.", true);
+            document.getElementById("password-change-form").reset();
+          } catch (err) {
+            console.error("Password update error:", err);
+            showAlert(err.message || "Failed to update security credentials.");
+          }
+        });
+      }
+
+      // Export Unified data backup
+      document.getElementById("download-all-backup-btn").addEventListener("click", async () => {
+        try {
+          // Fetch resumes
+          const qRes = query(collection(db, "resumes"), where("userId", "==", currentUser.uid));
+          const snapRes = await getDocs(qRes);
+          const resumes = [];
+          snapRes.forEach(d => resumes.push(d.data()));
+
+          // Fetch custom templates
+          const qTmpl = query(collection(db, "templates"), where("userId", "==", currentUser.uid));
+          const snapTmpl = await getDocs(qTmpl);
+          const templates = [];
+          snapTmpl.forEach(d => templates.push(d.data()));
+
+          const payload = {
+            exportVersion: "1.0",
+            exportedAt: new Date().toISOString(),
+            userId: currentUser.uid,
+            resumes,
+            templates
+          };
+
+          const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
+          const dlAnchor = document.createElement('a');
+          dlAnchor.setAttribute("href", dataStr);
+          dlAnchor.setAttribute("download", `ResumeMkr_Backup_${new Date().toISOString().split('T')[0]}.json`);
+          document.body.appendChild(dlAnchor);
+          dlAnchor.click();
+          dlAnchor.remove();
+          showAlert("Data backup downloaded successfully!", true);
+        } catch (err) {
+          showAlert("Could not compile database backup.");
+        }
+      });
+
+      // Restore backup triggers
+      const restoreFile = document.getElementById("restore-file-input");
+      document.getElementById("restore-backup-trigger").addEventListener("click", () => restoreFile.click());
+
+      restoreFile.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = async (event) => {
+            try {
+              const data = JSON.parse(event.target.result);
+              if (!data.resumes || !Array.isArray(data.resumes)) {
+                showAlert("Invalid backup schema. Resumes field is missing.");
+                return;
+              }
+
+              let count = 0;
+              for (const res of data.resumes) {
+                // Ensure proper owner mapping
+                res.userId = currentUser.uid;
+                await setDoc(doc(db, "resumes", res.resumeId), res);
+                count++;
+              }
+
+              showAlert(`Restore completed! Successfully imported ${count} resumes.`, true);
+            } catch (err) {
+              showAlert("Failed to parse backup JSON file. Confirm file integrity.");
+            }
+          };
+          reader.readAsText(file);
+        }
+      });
+
+      // Delete Account Flow
+      const deleteModal = document.getElementById("delete-account-modal");
+      const confirmInput = document.getElementById("delete-account-confirm-input");
+
+      document.getElementById("delete-account-btn").addEventListener("click", () => {
+        confirmInput.value = "";
+        deleteModal.classList.remove("hidden");
+      });
+
+      document.getElementById("delete-account-cancel-btn").addEventListener("click", () => {
+        deleteModal.classList.add("hidden");
+      });
+
+      document.getElementById("delete-account-confirm-btn").addEventListener("click", async () => {
+        if (confirmInput.value.trim().toUpperCase() !== "YES") {
+          alert("Please type YES to confirm account deletion.");
+          return;
+        }
+
+        try {
+          // 1. Purge all user's resumes
+          const qRes = query(collection(db, "resumes"), where("userId", "==", currentUser.uid));
+          const snapRes = await getDocs(qRes);
+          
+          const promises = [];
+          snapRes.forEach((d) => {
+            promises.push(deleteDoc(doc(db, "resumes", d.id)));
+          });
+          await Promise.all(promises);
+
+          // 2. Purge extra profile details
+          await deleteDoc(doc(db, "users", currentUser.uid));
+
+          // 3. Delete auth account
+          await deleteUserAccount(currentUser);
+          
+          deleteModal.classList.add("hidden");
+          window.location.href = "index.html";
+        } catch (err) {
+          deleteModal.classList.add("hidden");
+          showAlert(err.message || "Failed to purge account. Please log out and back in, then retry.");
+        }
+      });
+
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - ResumeMkr</title>
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./dashboard.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-900 selection:bg-indigo-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="dashboard.html" class="flex items-center gap-2">
+        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">R</div>
+        <span class="text-xl font-display font-bold tracking-tight text-slate-900">ResumeMkr</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-6">
+        <a href="dashboard.html" class="text-sm font-semibold text-indigo-600">My Resumes</a>
+        <a href="templates.html" class="text-sm font-medium text-slate-600 hover:text-indigo-600">Templates Gallery</a>
+        <a href="profile.html" class="text-sm font-medium text-slate-600 hover:text-indigo-600">Profile</a>
+        <a href="settings.html" class="text-sm font-medium text-slate-600 hover:text-indigo-600">Settings</a>
+      </nav>
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2.5">
+          <img id="nav-user-photo" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80&q=80" class="w-9 h-9 rounded-full border border-slate-200 shadow-sm" alt="Profile">
+          <span id="nav-user-name" class="hidden sm:inline text-xs font-semibold text-slate-700">Loading...</span>
+        </div>
+        <button id="logout-btn" class="text-slate-400 hover:text-rose-600 p-2 rounded-lg hover:bg-rose-50 transition-all cursor-pointer">
+          <i data-lucide="log-out" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="max-w-7xl mx-auto px-6 py-10 space-y-10">
+
+    <!-- Welcome & Stats Banner -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-gradient-to-r from-indigo-900 to-indigo-950 text-white rounded-3xl p-8 shadow-xl relative overflow-hidden">
+      <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-indigo-500 rounded-full blur-3xl opacity-20"></div>
+      <div class="space-y-2 relative z-10">
+        <h1 class="text-2xl sm:text-3xl font-display font-extrabold">Welcome back, <span id="welcome-user-name">Creator</span>! 👋</h1>
+        <p class="text-sm text-indigo-200">Start designing, customizing, or printing your ATS-optimized resume.</p>
+      </div>
+      <button id="create-resume-btn" class="px-6 py-3.5 bg-white hover:bg-slate-50 text-indigo-950 font-bold rounded-2xl transition-all shadow-lg text-sm flex items-center justify-center gap-2 self-start md:self-auto shrink-0 hover:scale-[1.02]">
+        <i data-lucide="plus" class="w-5 h-5 text-indigo-600"></i> Create New Resume
+      </button>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid sm:grid-cols-3 gap-6">
+      <div class="stat-card">
+        <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+          <i data-lucide="file-text"></i>
+        </div>
+        <div>
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Resumes</div>
+          <div id="stat-resumes-count" class="text-2xl font-bold text-slate-800">0</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+          <i data-lucide="star"></i>
+        </div>
+        <div>
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Favorites</div>
+          <div id="stat-favorites-count" class="text-2xl font-bold text-slate-800">0</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+          <i data-lucide="clock"></i>
+        </div>
+        <div>
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Last Edited</div>
+          <div id="stat-last-edited" class="text-sm font-semibold text-slate-700">Never</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
+      <div class="relative w-full sm:max-w-md">
+        <i data-lucide="search" class="absolute left-4 top-3.5 w-5 h-5 text-slate-400"></i>
+        <input type="text" id="search-input" placeholder="Search resumes by title, tag, or notes..." class="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition-all">
+      </div>
+      <div class="flex items-center gap-3 w-full sm:w-auto">
+        <select id="tag-filter" class="px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition-all w-full sm:w-auto cursor-pointer">
+          <option value="">All Tags</option>
+        </select>
+        <select id="favorite-filter" class="px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition-all w-full sm:w-auto cursor-pointer">
+          <option value="all">All Resumes</option>
+          <option value="favorites">Favorites Only</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Resume Cards Grid -->
+    <div>
+      <h2 class="text-xl font-display font-bold text-slate-800 mb-6">Recent Resumes</h2>
+      
+      <!-- Skeletons Loader -->
+      <div id="resumes-skeleton" class="dashboard-grid">
+        <div class="bg-white rounded-xl p-5 border border-slate-200 space-y-4">
+          <div class="skeleton h-6 w-2/3 rounded"></div>
+          <div class="skeleton h-4 w-1/2 rounded"></div>
+          <div class="skeleton h-10 w-full rounded mt-6"></div>
+        </div>
+        <div class="bg-white rounded-xl p-5 border border-slate-200 space-y-4">
+          <div class="skeleton h-6 w-2/3 rounded"></div>
+          <div class="skeleton h-4 w-1/2 rounded"></div>
+          <div class="skeleton h-10 w-full rounded mt-6"></div>
+        </div>
+      </div>
+
+      <!-- No Resumes State -->
+      <div id="no-resumes-container" class="hidden text-center py-20 bg-white border border-slate-200 rounded-3xl space-y-4">
+        <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 mx-auto">
+          <i data-lucide="file-question" class="w-8 h-8"></i>
+        </div>
+        <h3 class="font-bold text-lg text-slate-800">No Resumes Found</h3>
+        <p class="text-slate-500 text-sm max-w-sm mx-auto">Build your very first resume! Choose from one of our 30 predesigned ATS structures.</p>
+        <button id="no-resumes-create-btn" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition-all">
+          Create Resume
+        </button>
+      </div>
+
+      <!-- Active List Grid -->
+      <div id="resumes-grid" class="hidden dashboard-grid"></div>
+    </div>
+  </main>
+
+  <!-- Create New Resume Modal -->
+  <div id="create-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm px-4">
+    <div class="bg-white rounded-2xl border border-slate-100 max-w-md w-full p-6 shadow-2xl space-y-6">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-slate-800">New Resume Details</h3>
+        <button class="modal-close p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="create-resume-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Resume Name</label>
+          <input type="text" id="new-resume-name" required placeholder="e.g. Alex Rivera - Tech Resume" class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition-all">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Choose Layout Style</label>
+          <select id="new-resume-template" class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition-all cursor-pointer">
+            <option value="modern_ats">Modern ATS (One Column)</option>
+            <option value="classic">Classic Elegant (Traditional)</option>
+            <option value="professional">Professional Blue (Left-Align)</option>
+            <option value="minimal">Minimalist Light (Clean)</option>
+            <option value="creative">Creative Splash (Left Sidebar)</option>
+            <option value="developer_resume">Developer Modern (Terminal Header)</option>
+          </select>
+        </div>
+        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition-all flex items-center justify-center gap-2">
+          Create & Open Builder <i data-lucide="arrow-right" class="w-4.5 h-4.5"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Rename Resume Modal -->
+  <div id="rename-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm px-4">
+    <div class="bg-white rounded-2xl border border-slate-100 max-w-md w-full p-6 shadow-2xl space-y-6">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-slate-800">Rename Resume</h3>
+        <button class="modal-close p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="rename-resume-form" class="space-y-4">
+        <input type="hidden" id="rename-target-id">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">New Title</label>
+          <input type="text" id="rename-resume-name" required class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition-all">
+        </div>
+        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition-all">
+          Save Changes
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Resume Confirmation Modal -->
+  <div id="delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm px-4">
+    <div class="bg-white rounded-2xl border border-slate-100 max-w-md w-full p-6 shadow-2xl space-y-5">
+      <div class="flex items-center gap-3 text-rose-600">
+        <div class="p-2 bg-rose-50 rounded-xl">
+          <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+        </div>
+        <h3 class="text-lg font-bold font-display">Delete Resume</h3>
+      </div>
+      <p class="text-sm text-slate-600">Are you sure you want to delete this resume? This action is permanent and cannot be undone.</p>
+      <input type="hidden" id="delete-target-id">
+      <div class="flex items-center gap-3 pt-2">
+        <button type="button" id="delete-cancel-btn" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition-all cursor-pointer">
+          Cancel
+        </button>
+        <button type="button" id="delete-confirm-btn" class="flex-1 py-3 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl text-sm transition-all cursor-pointer">
+          Yes, Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./dashboard.js"></script>
+</body>
+</html>
