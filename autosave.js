@@ -1,6 +1,5 @@
 // Automatic Synchronizer & Backup Service for ResumeMkr
-import { db, handleFirestoreError, OperationType } from "./firebase.js";
-import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { db, handleFirestoreError, OperationType, doc, setDoc } from "./firebase.js";
 
 export class AutoSaveService {
   constructor(resumeId, userId, onStateChangeCallback) {

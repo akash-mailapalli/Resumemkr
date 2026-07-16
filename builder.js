@@ -1,10 +1,9 @@
 // Resume Builder Editor Engine for ResumeMkr
 import { initAuthProtection } from "./auth.js";
-import { db, handleFirestoreError, OperationType } from "./firebase.js";
+import { db, handleFirestoreError, OperationType, doc, getDoc, updateDoc } from "./firebase.js";
 import { TEMPLATES, DEFAULT_RESUME_DATA } from "./templates.js";
 import { AutoSaveService } from "./autosave.js";
 import { downloadPDF, downloadWord, downloadJSON } from "./export.js";
-import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // State
 let currentUser = null;
@@ -28,7 +27,6 @@ const zoomContainer = document.getElementById("zoom-container");
 const a4Preview = document.getElementById("resume-a4-preview");
 const scorePct = document.getElementById("resume-score-pct");
 const scoreComplete = document.getElementById("score-complete");
-const scoreAts = document.getElementById("score-ats");
 const scoreTip = document.getElementById("score-tip");
 const strengthBadge = document.getElementById("resume-strength-badge");
 
@@ -70,6 +68,36 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Setup Workspace theme toggle
   document.getElementById("builder-theme-toggle").addEventListener("click", toggleWorkspaceTheme);
+
+  // Setup Mobile Nav bar toggles
+  const mobileToggleEdit = document.getElementById("mobile-toggle-edit");
+  const mobileTogglePreview = document.getElementById("mobile-toggle-preview");
+  const splitContainer = document.getElementById("split-container");
+
+  if (mobileToggleEdit && mobileTogglePreview && splitContainer) {
+    mobileToggleEdit.addEventListener("click", () => {
+      splitContainer.classList.remove("show-preview");
+      splitContainer.classList.add("show-edit");
+      
+      // Update buttons active state
+      mobileToggleEdit.className = "flex-1 py-3 text-center text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 bg-indigo-600 text-white shadow";
+      mobileTogglePreview.className = "flex-1 py-3 text-center text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 text-slate-300 hover:text-white";
+    });
+
+    mobileTogglePreview.addEventListener("click", () => {
+      splitContainer.classList.remove("show-edit");
+      splitContainer.classList.add("show-preview");
+      
+      // Update buttons active state
+      mobileTogglePreview.className = "flex-1 py-3 text-center text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 bg-indigo-600 text-white shadow";
+      mobileToggleEdit.className = "flex-1 py-3 text-center text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 text-slate-300 hover:text-white";
+      
+      // Trigger zoom fit recalculation on next tick so the preview elements render perfectly scaled
+      setTimeout(() => {
+        fitZoomToPane();
+      }, 50);
+    });
+  }
 
   // Setup Rename modals
   const titleModal = document.getElementById("rename-title-modal");
@@ -134,6 +162,7 @@ async function loadResume() {
     renderLivePreview();
     calculateResumeScore();
     fitZoomToPane();
+    handleAutosaveStateChange('saved');
   } catch (err) {
     handleFirestoreError(err, OperationType.GET, `${collectionName}/${resumeId}`);
   }
@@ -1353,22 +1382,16 @@ function calculateResumeScore() {
   scoreComplete.textContent = `${score}%`;
 
   if (score >= 80) {
-    scoreAts.textContent = "Excellent";
-    scoreAts.className = "font-bold text-emerald-600";
-    strengthBadge.textContent = "Strong ATS";
+    strengthBadge.textContent = "Strong";
     strengthBadge.className = "px-2.5 py-0.5 bg-emerald-100 text-emerald-700 font-bold text-[10px] rounded-full uppercase tracking-wider";
-    scoreTip.innerHTML = `<span class="text-emerald-700 font-bold">✓ Optimized:</span> Your resume is fully complete, professional, and ATS optimized!`;
+    scoreTip.innerHTML = `<span class="text-emerald-700 font-bold">✓ Complete:</span> Your resume looks professional and comprehensive!`;
   } else if (score >= 50) {
-    scoreAts.textContent = "Good";
-    scoreAts.className = "font-bold text-amber-600";
     strengthBadge.textContent = "Intermediate";
     strengthBadge.className = "px-2.5 py-0.5 bg-amber-100 text-amber-700 font-bold text-[10px] rounded-full uppercase tracking-wider";
     scoreTip.innerHTML = tips.length > 0 
       ? `<div class="font-bold text-slate-700 mb-1">To reach 100%:</div><ul class="list-disc pl-3.5 space-y-0.5 text-slate-500">${tips.slice(0, 3).map(t => `<li>${t}</li>`).join("")}</ul>`
       : "Almost perfect, fill other sections.";
   } else {
-    scoreAts.textContent = "Weak";
-    scoreAts.className = "font-bold text-rose-600";
     strengthBadge.textContent = "Draft";
     strengthBadge.className = "px-2.5 py-0.5 bg-slate-100 text-slate-700 font-bold text-[10px] rounded-full uppercase tracking-wider";
     scoreTip.innerHTML = tips.length > 0
@@ -1783,20 +1806,39 @@ function renderLivePreview() {
   a4Preview.innerHTML = innerStructure;
   lucide.createIcons();
   calculateResumeScore();
+  applyZoom(currentZoom);
 }
 
 // Fit Zoom nicely
 function fitZoomToPane() {
   const previewPane = document.getElementById("preview-panel-pane");
-  const scale = (previewPane.clientWidth - 80) / 794;
-  applyZoom(Math.min(100, Math.max(50, Math.round(scale * 100))));
+  if (!previewPane) return;
+  const paddingOffset = window.innerWidth < 768 ? 32 : 80;
+  const scale = (previewPane.clientWidth - paddingOffset) / 794;
+  applyZoom(Math.min(100, Math.max(30, Math.round(scale * 100))));
 }
 
 function applyZoom(val) {
-  currentZoom = Math.min(150, Math.max(50, val));
-  zoomSlider.value = currentZoom;
-  zoomLabel.textContent = `${currentZoom}%`;
-  zoomContainer.style.transform = `scale(${currentZoom / 100})`;
+  currentZoom = Math.min(150, Math.max(30, val));
+  if (zoomSlider) zoomSlider.value = currentZoom;
+  if (zoomLabel) zoomLabel.textContent = `${currentZoom}%`;
+  
+  const scale = currentZoom / 100;
+  if (zoomContainer) {
+    zoomContainer.style.transform = `scale(${scale})`;
+    zoomContainer.style.transformOrigin = "top center";
+    
+    // Dynamically adjust wrapper dimensions to allocate correct layout space
+    const zoomWrapper = document.getElementById("zoom-wrapper");
+    if (zoomWrapper) {
+      const unscaledWidth = 794;
+      const a4Preview = document.getElementById("resume-a4-preview");
+      const unscaledHeight = (a4Preview ? a4Preview.offsetHeight : 0) || 1123;
+      
+      zoomWrapper.style.width = `${unscaledWidth * scale}px`;
+      zoomWrapper.style.height = `${unscaledHeight * scale}px`;
+    }
+  }
 }
 
 // Save trigger and state push

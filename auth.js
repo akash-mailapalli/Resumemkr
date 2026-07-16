@@ -1,6 +1,7 @@
 // Authentication, Session Tracking & Authorization for ResumeMkr
-import { auth, db } from "./firebase.js";
 import { 
+  auth, 
+  db,
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   signOut, 
@@ -13,9 +14,11 @@ import {
   signInWithPopup,
   sendEmailVerification,
   EmailAuthProvider,
-  reauthenticateWithCredential
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  reauthenticateWithCredential,
+  doc, 
+  setDoc, 
+  getDoc
+} from "./firebase.js";
 
 // Google provider
 const googleProvider = new GoogleAuthProvider();

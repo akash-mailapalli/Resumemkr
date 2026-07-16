@@ -133,3 +133,54 @@
   margin-top: 4px;
 }
 
+/* Mobile responsive layout overrides */
+@media (max-width: 768px) {
+  .builder-split-container {
+    height: calc(100vh - 64px) !important;
+    position: relative;
+    width: 100vw;
+  }
+  
+  /* Form panel takes full space when show-edit is on, and hidden when show-preview is on */
+  .builder-split-container.show-edit .builder-form-pane {
+    display: block !important;
+    width: 100% !important;
+    flex: 1 !important;
+  }
+  .builder-split-container.show-edit .builder-preview-pane {
+    display: none !important;
+  }
+
+  /* Preview panel takes full space when show-preview is on, and hidden when show-edit is on */
+  .builder-split-container.show-preview .builder-form-pane {
+    display: none !important;
+  }
+  .builder-split-container.show-preview .builder-preview-pane {
+    display: flex !important;
+    width: 100% !important;
+    flex: 1 !important;
+  }
+
+  .builder-form-pane {
+    padding: 16px 16px 88px 16px !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+    border-right: none !important;
+  }
+
+  .builder-preview-pane {
+    padding: 16px 16px 88px 16px !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: auto !important;
+  }
+
+  /* Adjust zoom controls layout on mobile */
+  .builder-preview-pane > div.mb-4 {
+    margin-bottom: 8px !important;
+    gap: 3px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+}
+

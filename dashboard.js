@@ -1,8 +1,9 @@
 // Dashboard Controller for ResumeMkr
 import { initAuthProtection, logoutUser } from "./auth.js";
-import { db, handleFirestoreError, OperationType } from "./firebase.js";
-import { DEFAULT_RESUME_DATA } from "./templates.js";
 import { 
+  db, 
+  handleFirestoreError, 
+  OperationType,
   collection, 
   query, 
   where, 
@@ -11,7 +12,8 @@ import {
   setDoc, 
   deleteDoc, 
   updateDoc 
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+} from "./firebase.js";
+import { DEFAULT_RESUME_DATA } from "./templates.js";
 
 // Global states
 let currentUser = null;

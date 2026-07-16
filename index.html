@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9366697793859587"
-     crossorigin="anonymous"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ResumeMkr - Create Beautiful ATS Friendly Resumes Free Forever</title>
   <link rel="stylesheet" href="./style.css">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9366697793859587" crossorigin="anonymous"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
@@ -26,10 +25,10 @@
 
   <!-- Header -->
   <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
-    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-2">
-        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-md shadow-indigo-200">R</div>
-        <span class="text-xl font-display font-bold tracking-tight text-slate-900">ResumeMkr</span>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-1.5 sm:gap-2">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-md shadow-indigo-200">R</div>
+        <span class="text-base sm:text-xl font-display font-bold tracking-tight text-slate-900">ResumeMkr</span>
       </a>
       <nav class="hidden md:flex items-center gap-8">
         <a href="index.html" class="text-sm font-medium text-indigo-600 hover:text-indigo-700">Home</a>
@@ -38,10 +37,10 @@
         <a href="#pricing" class="text-sm font-medium text-slate-600 hover:text-indigo-600">Pricing</a>
         <a href="#faq" class="text-sm font-medium text-slate-600 hover:text-indigo-600">FAQ</a>
       </nav>
-      <div id="auth-nav-container" class="flex items-center gap-4">
+      <div id="auth-nav-container" class="flex items-center gap-2 sm:gap-4">
         <!-- Will be dynamically loaded or fallback -->
-        <a href="login.html" class="text-sm font-semibold text-slate-700 hover:text-indigo-600">Login</a>
-        <a href="signup.html" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-indigo-100">Sign Up</a>
+        <a href="login.html" class="text-xs sm:text-sm font-semibold text-slate-700 hover:text-indigo-600">Login</a>
+        <a href="signup.html" class="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-md shadow-indigo-100 whitespace-nowrap">Sign Up</a>
       </div>
     </div>
   </header>
@@ -214,16 +213,15 @@
   </footer>
 
   <script type="module">
-    import { auth } from "./firebase.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { auth, onAuthStateChanged } from "./firebase.js";
 
     // Track user session and adjust top menu
     onAuthStateChanged(auth, (user) => {
       const authContainer = document.getElementById("auth-nav-container");
       if (user) {
         authContainer.innerHTML = `
-          <a href="dashboard.html" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-indigo-100 flex items-center gap-2">
-            Go to Dashboard <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          <a href="dashboard.html" class="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-md shadow-indigo-100 flex items-center gap-1 sm:gap-2 whitespace-nowrap">
+            Go to Dashboard <i data-lucide="arrow-right" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
           </a>
         `;
         lucide.createIcons();
